@@ -4,7 +4,7 @@ Idea: NFT Tamagatchi
 
 1.Users will have to register themselves somehow on the contract and get a NFT pet.
 
-2.Pet needs to be regularly fed (somehow) (24 hrs?)
+2.Pet needs to be regularly fed (somehow) (every 24 hrs?)
 
 3.Pet levels up after enough time and feeding
 
