@@ -1,22 +1,15 @@
 pragma solidity ^0.5.16;
 
-import "../node_modules/@openzeppelin/contracts/token/ERC721/ERC721Full.sol";
-import "../node_modules/@openzeppelin/contracts/token/ERC721/ERC721Mintable.sol";
-import "../node_modules/@openzeppelin/contracts/token/ERC721/ERC721Burnable.sol";
+import "./Pet.sol";
 
 
-contract PetFactory is ERC721Full, ERC721Mintable, ERC721Burnable {
+contract PetFactory is ERC721Mintable, ERC721Burnable  {
 
-    address private owner;
 
-    constructor() ERC721Full("Pet", "PET") public {
-        owner = msg.sender;
-    }
-
-    modifier isOwner(){
-        require(msg.sender == owner);
-        _;
-    }
+    event LogPetGenerate(address indexed petOwner, uint petId);
+    event LogPetCheck(address indexed petOwner, uint petId, string status, uint nextFeed);
+    event LogPetFeed(address indexed petOwner, uint petId, string status, uint nextFeed);
+    event LogPetKill(address indexed petOwner, uint petId);
 
     enum PetStatus {Alive, Dead}
 
@@ -27,10 +20,11 @@ contract PetFactory is ERC721Full, ERC721Mintable, ERC721Burnable {
         
     }
 
+
     mapping(address=>PetInfo) petList;
     uint petCount;
 
-    function generatePet(address petOwner, string memory tokenURI) public isOwner returns (uint256) {
+    function generatePet() public returns (uint256) {
         
 
         uint256 petId = petCount;
@@ -39,47 +33,62 @@ contract PetFactory is ERC721Full, ERC721Mintable, ERC721Burnable {
         PetInfo memory petInfo;
         petInfo.petId = petId;
         petInfo.petStatus = PetStatus.Alive;
-        petInfo.nextFeed = block.timestamp + 604800; // one week
+        petInfo.nextFeed = block.timestamp; // one week
 
-        petList[petOwner] = petInfo;
+        petList[msg.sender] = petInfo;
 
-        _mint(petOwner, petId);
-        _setTokenURI(petId, tokenURI);
+        new Pet(petId, petInfo.nextFeed);
+        safeMint(msg.sender, petId);
 
         return petId;
     }
 
-    function killPet(address petOwner) internal isOwner {
-        uint petId = petList[petOwner].petId;
-        petList[petOwner].petStatus = PetStatus.Dead;
-        _burn(petId);
-
+    function killPet() internal {
+        uint petId = petList[msg.sender].petId;
+        petList[msg.sender].petStatus = PetStatus.Dead;
+        burn(petId);
     }
 
-    function feedPet(address petOwner) public isOwner {
+    function feedPet(uint time) public {
 
-        if (petList[petOwner].nextFeed > block.timestamp ) {
-            petList[petOwner].nextFeed = block.timestamp + 604800;
+        if (1==1 ) {
+            PetInfo memory pi = petList[msg.sender];
+            pi.nextFeed = time + 604800;
+            delete petList[msg.sender];
+
+            petList[msg.sender] = pi;
         } else {
-            killPet(petOwner);
-        }
-
-    }
-
-    function checkPetInfo(address petOwner) public returns (string memory petStatus, uint nextFeed) {
-        if (petList[petOwner].nextFeed < block.timestamp ) {
-            killPet(petOwner);
+            killPet();
         }
 
 
-        if (petList[petOwner].petStatus == PetStatus.Alive) {
+        string memory petStatus;
+        if (petList[msg.sender].petStatus == PetStatus.Alive) {
             petStatus = 'Alive';
         } else {
             petStatus = 'Dead';
         }
 
-        return (petStatus, petList[petOwner].nextFeed);
+        emit LogPetFeed(msg.sender, petList[msg.sender].petId, petStatus, petList[msg.sender].nextFeed);
+
     }
+
+    function checkPetInfo() public returns (string memory petStatus, uint nextFeed) {
+        if (petList[msg.sender].nextFeed < block.timestamp ) {
+            killPet();
+        }
+
+
+        if (petList[msg.sender].petStatus == PetStatus.Alive) {
+            petStatus = 'Alive';
+        } else {
+            petStatus = 'Dead';
+        }
+
+        emit LogPetCheck(msg.sender, petList[msg.sender].petId, petStatus, petList[msg.sender].nextFeed);
+        return (petStatus, petList[msg.sender].nextFeed);
+    }
+
     
 }
 
