@@ -3,7 +3,6 @@ pragma solidity ^0.5.16;
 import "../node_modules/@openzeppelin/contracts/token/ERC721/ERC721Full.sol";
 import "../node_modules/@openzeppelin/contracts/token/ERC721/ERC721Mintable.sol";
 import "../node_modules/@openzeppelin/contracts/token/ERC721/ERC721Burnable.sol";
-import "./DateTime.sol";
 
 
 contract PetFactory is ERC721Full, ERC721Mintable, ERC721Burnable {
