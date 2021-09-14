@@ -43,6 +43,7 @@ App = {
       // Set the provider for our contract
       App.contracts.PetFactory.setProvider(App.web3Provider);
 
+
     
       // init logs
       //App.LogCheck();
@@ -81,22 +82,23 @@ App = {
         // Execute adopt as a transaction by sending account
         return petFactoryInstance.checkPetInfo({from: account});
       }).then(function(result) {
-        console.log(result);
-        console.log(result.logs[0].args.petOwner);
-        console.log(result.logs[0].args.status);
-        console.log(result.logs[0].args.nextFeed.c[0]);
-        console.log(result.logs[0].args.petId.c[0]);
+        var len = result.logs.length - 1;
+        console.log(len);
+        console.log(result.logs[len].args.petOwner);
+        console.log(result.logs[len].args.status);
+        console.log(result.logs[len].args.nextFeed.c[0]);
+        console.log(result.logs[len].args.petId.c[0]);
 
-        var text = `Pet ID: ` + result.logs[0].args.petId.c[0];
+        var text = `Pet ID: ` + result.logs[len].args.petId.c[0];
         $('#PetInfo').find('.PetID').text(text);
 
-        text =  `Pet Owner: ` + result.logs[0].args.petOwner ;
+        text =  `Pet Owner: ` + result.logs[len].args.petOwner ;
         $('#PetInfo').find('.PetOwner').text(text);
 
-        text =  `Pet Status: ` + result.logs[0].args.status ;
+        text =  `Pet Status: ` + result.logs[len].args.status ;
         $('#PetInfo').find('.PetStatus').text(text);
 
-        var date = new Date(result.logs[0].args.nextFeed.c[0] * 1000);
+        var date = new Date(result.logs[len].args.nextFeed.c[0] * 1000);
         
         text =  `Next Feed: ` + date.toString();
 
@@ -158,23 +160,24 @@ App = {
         petFactoryInstance = instance;
 
         // Execute adopt as a transaction by sending account
-        return petFactoryInstance.feedPet(+new Date, {from: account});
+        return petFactoryInstance.feedPet({from: account});
       }).then(function(result) {
+        var len = result.logs.length - 1;
         console.log(result);
-        console.log(result.logs[0].args.petOwner);
-        console.log(result.logs[0].args.nextFeed.c[0]);
-        console.log(result.logs[0].args.petId.c[0]);
+        console.log(result.logs[len].args.petOwner);
+        console.log(result.logs[len].args.nextFeed.c[0]);
+        console.log(result.logs[len].args.petId.c[0]);
 
-        var text = `Pet ID: ` + result.logs[0].args.petId.c[0];
+        var text = `Pet ID: ` + result.logs[len].args.petId.c[0];
         $('#PetInfo').find('.PetID').text(text);
 
-        text =  `Pet Owner: ` + result.logs[0].args.petOwner ;
+        text =  `Pet Owner: ` + result.logs[len].args.petOwner ;
         $('#PetInfo').find('.PetOwner').text(text);
 
-        text =  `Pet Status: ` + result.logs[0].args.status ;
+        text =  `Pet Status: ` + result.logs[len].args.status ;
         $('#PetInfo').find('.PetStatus').text(text);
 
-        var date = new Date(result.logs[0].args.nextFeed.c[0] * 1000);
+        var date = new Date(result.logs[len].args.nextFeed.c[0] * 1000);
         
         text =  `Next Feed: ` + date.toString();
 

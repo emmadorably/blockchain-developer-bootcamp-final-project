@@ -33,7 +33,7 @@ contract PetFactory is ERC721Mintable, ERC721Burnable  {
         PetInfo memory petInfo;
         petInfo.petId = petId;
         petInfo.petStatus = PetStatus.Alive;
-        petInfo.nextFeed = block.timestamp; // one week
+        petInfo.nextFeed = block.timestamp + 604800; // one week
 
         petList[msg.sender] = petInfo;
 
@@ -49,18 +49,9 @@ contract PetFactory is ERC721Mintable, ERC721Burnable  {
         burn(petId);
     }
 
-    function feedPet(uint time) public {
-
-        if (1==1 ) {
-            PetInfo memory pi = petList[msg.sender];
-            pi.nextFeed = time + 604800;
-            delete petList[msg.sender];
-
-            petList[msg.sender] = pi;
-        } else {
-            killPet();
-        }
-
+    function feedPet() public {
+    
+        petList[msg.sender].nextFeed += 604800;
 
         string memory petStatus;
         if (petList[msg.sender].petStatus == PetStatus.Alive) {
@@ -74,6 +65,7 @@ contract PetFactory is ERC721Mintable, ERC721Burnable  {
     }
 
     function checkPetInfo() public returns (string memory petStatus, uint nextFeed) {
+        
         if (petList[msg.sender].nextFeed < block.timestamp ) {
             killPet();
         }
